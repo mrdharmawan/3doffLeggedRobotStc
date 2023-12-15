@@ -377,10 +377,7 @@ void Inverse2Doff (float x, float y){
 			 char inp;
 			 cin >> inp;
 			 if (inp == '1') {
-				 Motor[0].setOrigin();
-				 Motor[1].setOrigin();
-				 Motor[2].setOrigin();
-				 //MainState = 2;
+				 MainState = 2;
 			 }
 		 }
 		 break;
