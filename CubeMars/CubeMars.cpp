@@ -143,12 +143,19 @@ void PIDCurrent(double Target[3], double kpIn, double kdIn, double kiIn) {
 	double out[3];
 
 	updateState();
-
 	for (int i = 0;i < 3;i++) {
 		err[i] = Target[i] - Motor[i].yPos;
-		out[i] = err[i] * kpIn/1000 + Ierr[i] * kiIn/1000 + Motor[i].ERPM * kdIn/1000;
-		Motor[i].xCurr = out[i];
+	}
+	for (int i = 0;i < 3;i++) {
+		out[i] = err[i] * kpIn / 1000 + Ierr[i] * kiIn / 1000 + Motor[i].ERPM * kdIn / 1000;
+	}
+	for (int i = 0;i < 3;i++) {
+		Motor[i].xSpd = out[i];
+	}
+	for (int i = 0;i < 3;i++) {
 		Motor[i].setCurr();
+	}
+	for (int i = 0;i < 3;i++) {
 		Ierr[i] += err[i];
 	}
 }
@@ -160,12 +167,19 @@ void PIDDuty(double Target[3], double kpIn, double kdIn, double kiIn) {
 	double out[3];
 
 	updateState();
-
 	for (int i = 0;i < 3;i++) {
 		err[i] = Target[i] - Motor[i].yPos;
+	}
+	for (int i = 0;i < 3;i++) {
 		out[i] = err[i] * kpIn / 50000 + Ierr[i] * kiIn / 50000 + Motor[i].ERPM * kdIn / 50000;
-		Motor[i].xDuty = out[i];
+	}
+	for (int i = 0;i < 3;i++) {
+		Motor[i].xSpd = out[i];
+	}
+	for (int i = 0;i < 3;i++) {
 		Motor[i].setDuty();
+	}
+	for (int i = 0;i < 3;i++) {
 		Ierr[i] += err[i];
 	}
 }
@@ -227,7 +241,7 @@ void Inverse2Doff (float x, float y){
  void SafetyStop() {
 	 //Failsafe 
 	 safe = safePos();
-	 if (!safe && MainState > 0) {
+	 if (!safe && MainState > 1) {
 		 run = false;
 		 MainState = 0;
 		 cout << "Failsafe!!!! " << endl;
@@ -458,7 +472,7 @@ void loop()
 
 	}
 
-	//SafetyStop(); //Safety Function
+	SafetyStop(); //Safety Function
 
 	Routine(); // Update and run the motor
 
