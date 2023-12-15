@@ -46,14 +46,14 @@ double InvFrontPos;
 
 const double MinMaxPos[3][2] = { // sudut range tiap motor untuk failsafe
 	//min , max
-	{115, 147}, //motor Belakang
-	{40, 155}, // motor Tengah
-	{-145, 20} // motor depan 
+	{-20, 20}, //motor Belakang
+	{-10, 5}, // motor Tengah
+	{-175, -24} // motor depan 
 };
 
-const double HomePos[3] =  {0,135, -18}; // homming 
+const double HomePos[3] =  {0,31, -69}; // homming 
 
-double pos[3] = { 0,135, -18 }; //set awal harus homming
+double pos[3] = { 0,31, -69 }; //set awal harus homming
 
 
 BOOL WINAPI ConsoleHandler(
@@ -119,12 +119,19 @@ void PIDSpeed (double Target[3], double kpIn, double kdIn, double kiIn) {
 	double out[3];
 
 	updateState();
-
 	for (int i = 0;i < 3;i++) {
 		err[i] = Target[i] - Motor[i].yPos;
+	}
+	for (int i = 0;i < 3;i++) {
 		out[i] = err[i] * kpIn + Ierr[i] * kiIn + Motor[i].ERPM * kdIn;
+	}
+	for (int i = 0;i < 3;i++) {
 		Motor[i].xSpd = out[i];
+	}
+	for (int i = 0;i < 3;i++) {
 		Motor[i].setSpd();
+	}
+	for (int i = 0;i < 3;i++) {
 		Ierr[i] += err[i];
 	}
 }
@@ -356,10 +363,10 @@ void Inverse2Doff (float x, float y){
 			 char inp;
 			 cin >> inp;
 			 if (inp == '1') {
-				 //Motor[0].setOrigin();
-				 //Motor[1].setOrigin();
-				 //Motor[2].setOrigin();
-				 MainState = 2;
+				 Motor[0].setOrigin();
+				 Motor[1].setOrigin();
+				 Motor[2].setOrigin();
+				 //MainState = 2;
 			 }
 		 }
 		 break;
@@ -436,9 +443,9 @@ void Inverse2Doff (float x, float y){
 
 void setup()
 {
-	Motor[0].begin(baud, 15); //Back
-	Motor[1].begin(baud,17); //Mid
-	Motor[2].begin(baud, 9); //Front
+	Motor[0].begin(baud, 19); //Back
+	Motor[1].begin(baud,18); //Mid
+	Motor[2].begin(baud, 20); //Front
 	ControlMode = 0;
 	Sleep(1000);
 }
