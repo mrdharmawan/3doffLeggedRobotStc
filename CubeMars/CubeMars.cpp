@@ -46,14 +46,14 @@ double InvFrontPos;
 
 const double MinMaxPos[3][2] = { // sudut range tiap motor untuk failsafe
 	//min , max
-	{-20, 20}, //motor Belakang
-	{-10, 5}, // motor Tengah
-	{-175, -24} // motor depan 
+	{115, 147}, //motor Belakang
+	{40, 155}, // motor Tengah
+	{-175, -53} // motor depan 
 };
 
-const double HomePos[3] =  {0,31, -69}; // homming 
+const double HomePos[3] =  { 3,72,-113 }; // homming 
 
-double pos[3] = { 0,31, -69 }; //set awal harus homming
+double pos[3] = { 0,0, -79 }; //set awal harus homming
 
 
 BOOL WINAPI ConsoleHandler(
@@ -119,19 +119,12 @@ void PIDSpeed (double Target[3], double kpIn, double kdIn, double kiIn) {
 	double out[3];
 
 	updateState();
+
 	for (int i = 0;i < 3;i++) {
 		err[i] = Target[i] - Motor[i].yPos;
-	}
-	for (int i = 0;i < 3;i++) {
 		out[i] = err[i] * kpIn + Ierr[i] * kiIn + Motor[i].ERPM * kdIn;
-	}
-	for (int i = 0;i < 3;i++) {
 		Motor[i].xSpd = out[i];
-	}
-	for (int i = 0;i < 3;i++) {
 		Motor[i].setSpd();
-	}
-	for (int i = 0;i < 3;i++) {
 		Ierr[i] += err[i];
 	}
 }
@@ -143,19 +136,12 @@ void PIDCurrent(double Target[3], double kpIn, double kdIn, double kiIn) {
 	double out[3];
 
 	updateState();
+
 	for (int i = 0;i < 3;i++) {
 		err[i] = Target[i] - Motor[i].yPos;
-	}
-	for (int i = 0;i < 3;i++) {
-		out[i] = err[i] * kpIn / 1000 + Ierr[i] * kiIn / 1000 + Motor[i].ERPM * kdIn / 1000;
-	}
-	for (int i = 0;i < 3;i++) {
-		Motor[i].xSpd = out[i];
-	}
-	for (int i = 0;i < 3;i++) {
+		out[i] = err[i] * kpIn/1000 + Ierr[i] * kiIn/1000 + Motor[i].ERPM * kdIn/1000;
+		Motor[i].xCurr = out[i];
 		Motor[i].setCurr();
-	}
-	for (int i = 0;i < 3;i++) {
 		Ierr[i] += err[i];
 	}
 }
@@ -167,19 +153,12 @@ void PIDDuty(double Target[3], double kpIn, double kdIn, double kiIn) {
 	double out[3];
 
 	updateState();
+
 	for (int i = 0;i < 3;i++) {
 		err[i] = Target[i] - Motor[i].yPos;
-	}
-	for (int i = 0;i < 3;i++) {
 		out[i] = err[i] * kpIn / 50000 + Ierr[i] * kiIn / 50000 + Motor[i].ERPM * kdIn / 50000;
-	}
-	for (int i = 0;i < 3;i++) {
-		Motor[i].xSpd = out[i];
-	}
-	for (int i = 0;i < 3;i++) {
+		Motor[i].xDuty = out[i];
 		Motor[i].setDuty();
-	}
-	for (int i = 0;i < 3;i++) {
 		Ierr[i] += err[i];
 	}
 }
@@ -241,7 +220,7 @@ void Inverse2Doff (float x, float y){
  void SafetyStop() {
 	 //Failsafe 
 	 safe = safePos();
-	 if (!safe && MainState > 1) {
+	 if (!safe && MainState > 0) {
 		 run = false;
 		 MainState = 0;
 		 cout << "Failsafe!!!! " << endl;
@@ -307,6 +286,8 @@ void Inverse2Doff (float x, float y){
 	{0,135, -18},
 	{0,116, -117},
 	{0,135, -18},
+	//3,72,-113
+//2,53,-173
 
  };
  void Jump() {
@@ -377,6 +358,9 @@ void Inverse2Doff (float x, float y){
 			 char inp;
 			 cin >> inp;
 			 if (inp == '1') {
+				 Motor[0].setOrigin();
+				 Motor[1].setOrigin();
+				 Motor[2].setOrigin();
 				 MainState = 2;
 			 }
 		 }
@@ -386,7 +370,7 @@ void Inverse2Doff (float x, float y){
 	 case 2: {		//HOMING program
 		 if (clock() - lastpos > 5) {
 			 memcpy(pos, HomePos, sizeof(HomePos));
-			 kp = 20;
+			 kp = 80;
 			 run = true;
 
 			 if (
@@ -444,7 +428,7 @@ void Inverse2Doff (float x, float y){
 		 break;
 	 }
 	 case 4: {
-		 MovementSwitch();
+		 //MovementSwitch();
 	 }
 	 default: {
 		 break;
@@ -454,9 +438,9 @@ void Inverse2Doff (float x, float y){
 
 void setup()
 {
-	Motor[0].begin(baud, 19); //Back
-	Motor[1].begin(baud,18); //Mid
-	Motor[2].begin(baud, 20); //Front
+	Motor[0].begin(baud, 7); //Back
+	Motor[1].begin(baud,9); //Mid
+	Motor[2].begin(baud, 6); //Front
 	ControlMode = 0;
 	Sleep(1000);
 }
@@ -469,7 +453,7 @@ void loop()
 
 	}
 
-	SafetyStop(); //Safety Function
+	//SafetyStop(); //Safety Function
 
 	Routine(); // Update and run the motor
 
