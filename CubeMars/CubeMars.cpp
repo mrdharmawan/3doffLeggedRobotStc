@@ -118,13 +118,19 @@ void PIDSpeed (double Target[3], double kpIn, double kdIn, double kiIn) {
 	double Ierr[3];
 	double out[3];
 
-	updateState();
-
 	for (int i = 0;i < 3;i++) {
 		err[i] = Target[i] - Motor[i].yPos;
+	}
+	for (int i = 0;i < 3;i++) {
 		out[i] = err[i] * kpIn + Ierr[i] * kiIn + Motor[i].ERPM * kdIn;
+	}
+	for (int i = 0;i < 3;i++) {
 		Motor[i].xSpd = out[i];
+	}
+	for (int i = 0;i < 3;i++) {
 		Motor[i].setSpd();
+	}
+	for (int i = 0;i < 3;i++) {
 		Ierr[i] += err[i];
 	}
 }
@@ -135,13 +141,19 @@ void PIDCurrent(double Target[3], double kpIn, double kdIn, double kiIn) {
 	double Ierr[3];
 	double out[3];
 
-	updateState();
-
 	for (int i = 0;i < 3;i++) {
 		err[i] = Target[i] - Motor[i].yPos;
-		out[i] = err[i] * kpIn/1000 + Ierr[i] * kiIn/1000 + Motor[i].ERPM * kdIn/1000;
+	}
+	for (int i = 0;i < 3;i++) {
+		out[i] = err[i] * kpIn / 1000 + Ierr[i] * kiIn / 1000 + Motor[i].ERPM * kdIn / 1000;
+	}
+	for (int i = 0;i < 3;i++) {
 		Motor[i].xCurr = out[i];
+	}
+	for (int i = 0;i < 3;i++) {
 		Motor[i].setCurr();
+	}
+	for (int i = 0;i < 3;i++) {
 		Ierr[i] += err[i];
 	}
 }
@@ -152,15 +164,22 @@ void PIDDuty(double Target[3], double kpIn, double kdIn, double kiIn) {
 	double Ierr[3];
 	double out[3];
 
-	updateState();
-
 	for (int i = 0;i < 3;i++) {
 		err[i] = Target[i] - Motor[i].yPos;
+	}
+	for (int i = 0;i < 3;i++) {
 		out[i] = err[i] * kpIn / 50000 + Ierr[i] * kiIn / 50000 + Motor[i].ERPM * kdIn / 50000;
+	}
+	for (int i = 0;i < 3;i++) {
 		Motor[i].xDuty = out[i];
+	}
+	for (int i = 0;i < 3;i++) {
 		Motor[i].setDuty();
+	}
+	for (int i = 0;i < 3;i++) {
 		Ierr[i] += err[i];
 	}
+
 }
 
 void setHBrake (){
@@ -263,9 +282,7 @@ void Inverse2Doff (float x, float y){
 
  void Routine() {
 	 if (clock() - looptime > 5) {
-		 if (!run) {
-			 updateState();
-		 }
+		updateState();
 		 if (MainState > 1) {
 			 if (hbrake) {
 				 setHBrake();
